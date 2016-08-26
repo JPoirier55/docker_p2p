@@ -2,6 +2,7 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponse
 import requests
+from models import File
 
 # Create your views here.
 
@@ -18,5 +19,8 @@ def index(request):
 
 
 def filelist_api(request):
-    filelist = {'files': ['test2.txt', 'test.txt', 'test3.txt']}
-    return HttpResponse(json.dumps(filelist))
+    filelist = File.objects.all()
+    html = ''
+    for file in filelist:
+        html += file.__str__() + '<br>'
+    return HttpResponse(html)
