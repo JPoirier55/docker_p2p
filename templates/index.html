@@ -7,6 +7,12 @@
 <body>
 
     <h1>Containerized p2p network</h1>
+    {% for file in files.items %}
+        {{ file.0 }}<br>
+        {% for f in file.1 %}
+            {{ f }}<br>
 
+        {% endfor %}
+    {% endfor %}
 </body>
 </html>
