@@ -44,6 +44,8 @@ def search_neighbor(request):
         response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
 
         response = HttpResponse(response.content, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+
 
         return response
 
