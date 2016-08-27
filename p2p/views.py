@@ -2,6 +2,10 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponse
 import requests
+from models import File, Neighbors
+from wsgiref.util import FileWrapper
+import tarfile
+
 
 # Create your views here.
 
@@ -18,5 +22,32 @@ def index(request):
 
 
 def filelist_api(request):
-    filelist = {'files': ['test2.txt', 'test.txt', 'test3.txt']}
-    return HttpResponse(json.dumps(filelist))
+    filelist = File.objects.all()
+    html = ''
+    for file in filelist:
+        html += file.__str__()
+    return HttpResponse(html)
+
+
+def download_file(request):
+    filename = request.GET.get('filename')
+    files = File.objects.filter(name=filename)
+    print files
+    if files:
+        default = files[0]
+        response = HttpResponse(content_type='application/x-gzip')
+        print response
+        response['Content-Disposition'] = 'attachment; filename=myfile.tar.gz'
+        tarred = tarfile.open(fileobj=response, mode='w:gz')
+        tarred.add(default.location)
+        tarred.close()
+        return response
+        # return
+    else:
+        return HttpResponse('no')
+
+
+    # html = 'successful'
+    # response = HttpResponse(html, content_type='text/plain')
+    # response['Content-Disposition'] = 'attachment; filename="test.txt"'
+    # return response
