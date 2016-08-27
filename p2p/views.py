@@ -3,6 +3,7 @@ import json
 from django.http import HttpResponse
 import requests
 from models import File, Neighbors
+import tarfile
 
 # Create your views here.
 
