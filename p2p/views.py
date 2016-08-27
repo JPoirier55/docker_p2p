@@ -29,7 +29,18 @@ def filelist_api(request):
 
 
 def download_file(request):
-    html = 'successful'
-    response = HttpResponse(html, content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename="test.txt"'
-    return response
+    filename = request.GET.get('filename')
+    files = File.objects.filter(name=filename)
+    print files
+    if files:
+        default = files[0]
+        response = HttpResponse(content_type='application/x-gzip')
+        print response
+        response['Content-Disposition'] = 'attachment; filename=myfile.tar.gz'
+        tarred = tarfile.open(fileobj=response, mode='w:gz')
+        tarred.add(default.location)
+        tarred.close()
+        return response
+        # return
+    else:
+        return HttpResponse('no')
