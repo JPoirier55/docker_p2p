@@ -1,2 +1,5 @@
 *.pyc
 *.idea
+/p2p/static/files
+/p2p/migrations
+db.sqlite3

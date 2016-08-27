@@ -22,4 +22,6 @@ urlpatterns = [
     url(r'^$', views.index),
     url(r'^api/v1/filelist$', views.filelist_api),
     url(r'^api/v1/file$', views.download_file),
+    url(r'^search$', views.search_neighbor),
+
 ]

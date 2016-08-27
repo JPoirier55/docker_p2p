@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
@@ -11,5 +12,13 @@
         {{ file }}<br>
 
     {% endfor %}
+<input id="inputbox" type="text" value="{{ filename }}"><br>
+<button id="mybutt">Click</button>
+<script>
+    $("#mybutt").click(function(){
+        var text = $("#inputbox").val();
+
+    });
+</script>
 </body>
 </html>

@@ -1,24 +1,27 @@
 from django.shortcuts import render
 import json
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 import requests
 from models import File, Neighbors
 import tarfile
+import logging
+import os
 
 # Create your views here.
 
 
 def index(request):
     neighbors = Neighbors.objects.all()
+    filename = request.GET.get('filename')
+    if filename is None:
+        filename = ''
     aggregate_list = {}
     for neighbor in neighbors:
         response = requests.get('http://{0}:{1}/api/v1/filelist'.format(neighbor.ip_address, neighbor.port))
-        # filelist = json.loads(response.text)['files']
         aggregate_list[neighbor.hostname] = response.text
 
-    # file = request.get('192.168.181.131:8001')
-
-    return render(request, 'index.html', {'files': aggregate_list})
+    return render(request, 'index.html', {'files': aggregate_list,
+                                          'filename': filename})
 
 
 def filelist_api(request):
@@ -29,19 +32,40 @@ def filelist_api(request):
     return HttpResponse(html)
 
 
+def search_neighbor(request):
+    neighbors = Neighbors.objects.all()
+    filename = request.GET.get('filename')
+    if filename is None:
+        # TODO tell user to enter a file
+        return HttpResponseRedirect('/')
+
+    aggregate_list = {}
+    for neighbor in neighbors:
+        response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
+
+        response = HttpResponse(response.content, content_type='application/x-gzip')
+
+        return response
+
+    return render(request, 'index.html', {'files': aggregate_list,
+                                          'filename': filename})
+
+
 def download_file(request):
     filename = request.GET.get('filename')
     files = File.objects.filter(name=filename)
     print files
+    print filename
     if files:
         default = files[0]
-        response = HttpResponse(content_type='application/x-gzip')
-        print response
-        response['Content-Disposition'] = 'attachment; filename=myfile.tar.gz'
-        tarred = tarfile.open(fileobj=response, mode='w:gz')
-        tarred.add(default.location)
-        tarred.close()
+        dir = os.getcwd()
+        print dir
+        raw_text = open(dir + '/p2p/static/files/' + default.name, 'r').read()
+
+        response = HttpResponse(raw_text, content_type='text/plain')
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+
+        logging.debug("Response: {0}".format(response))
         return response
-        # return
     else:
-        return HttpResponse('no')
+        return HttpResponseRedirect('/?filename={0}'.format(filename))
