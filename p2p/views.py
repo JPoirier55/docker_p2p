@@ -43,7 +43,7 @@ def search_neighbor(request):
     for neighbor in neighbors:
         response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
 
-        response = HttpResponse(response.content, content_type='application/x-gzip')
+        response = HttpResponse(response.content, content_type='text/plain')
 
         return response
 
