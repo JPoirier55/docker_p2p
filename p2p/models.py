@@ -6,6 +6,9 @@ from django.db import models
 class File(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=256)
+
+    # TODO Add type of file: ex. text/plain, application/s.xml etc
+
     FICTION = 'Fiction'
     NONFICTION = 'Non-Fiction'
     TECHNICAL = 'Technical'
