@@ -2,19 +2,20 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponse
 import requests
-from models import File
+from models import File, Neighbors
 
 # Create your views here.
 
 
 def index(request):
-    ip_adds = [ '192.168.181.131:8001', '192.168.181.131:8002']
+    neighbors = Neighbors.objects.all()
     aggregate_list = {}
-    for ip in ip_adds:
-        response = requests.get('http://{0}/api/v1/filelist'.format(ip))
+    for neighbor in neighbors:
+        response = requests.get('http://{0}:{1}/api/v1/filelist'.format(neighbor.ip_address, neighbor.port))
         # filelist = json.loads(response.text)['files']
-        aggregate_list[ip] = response.text
-    file = request.get('192.168.181.131:8001')
+        aggregate_list[neighbor.hostname] = response.text
+
+    # file = request.get('192.168.181.131:8001')
 
     return render(request, 'index.html', {'files': aggregate_list})
 
