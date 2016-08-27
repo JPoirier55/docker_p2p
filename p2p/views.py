@@ -42,10 +42,11 @@ def search_neighbor(request):
     aggregate_list = {}
     for neighbor in neighbors:
         response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
-
+        print response.text
+        if response.text == 'None':
+            return HttpResponse('None')
         response = HttpResponse(response.content, content_type='text/plain')
         response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-
 
         return response
 
@@ -70,4 +71,4 @@ def download_file(request):
         logging.debug("Response: {0}".format(response))
         return response
     else:
-        return HttpResponseRedirect('/?filename={0}'.format(filename))
+        return HttpResponse('None')
