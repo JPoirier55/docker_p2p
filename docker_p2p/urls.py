@@ -20,5 +20,6 @@ from p2p import views
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.index),
-    url(r'^api/v1/filelist$', views.filelist_api)
+    url(r'^api/v1/filelist$', views.filelist_api),
+    url(r'^api/v1/file$', views.download_file),
 ]
