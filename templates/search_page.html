@@ -15,7 +15,8 @@
     $("#mybutton").click(function(){
         var text = $("#inputbox").val();
         console.log(text);
-        window.location.replace('http://127.0.0.1:8000/search_results?filename='+text)
+        var host = window.location.host;
+        window.location.replace('http://'+host+'/search_results?filename='+text)
     });
 </script>
 </body>
