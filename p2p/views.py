@@ -89,7 +89,6 @@ def filelist_api(request):
         json_response.append({'name': file.name,
                               'location': file.location,
                               'category': file.category,
-                              'parent': 'None',
                               'host': host,
                               'port': port})
     if filename is None:
@@ -107,9 +106,7 @@ def filelist_api(request):
                     json_response.append({'name': response_file['name'],
                                           'location': response_file['location'],
                                           'category': response_file['category'],
-                                          'parent': host,
                                           'host': response_file['host'],
                                           'port': response_file['port']})
-            print json_response
 
     return HttpResponse(json.dumps(json_response))
