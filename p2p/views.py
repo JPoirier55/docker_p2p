@@ -26,6 +26,14 @@ def index(request):
 
 def filelist_api(request):
     host, port = request.META['HTTP_HOST'].split(':')
+    neighbors = Neighbors.objects.all()
+    print 'NEIGHBORS', neighbors
+    filename = request.GET.get('filename')
+    if filename is None:
+        filename = ''
+    if len(neighbors) != 0:
+        return HttpResponseRedirect('/search_results?filename={0}'.format(filename))
+
     filelist = File.objects.all()
     json_response = []
     for file in filelist:
@@ -40,12 +48,13 @@ def filelist_api(request):
 
 def search_results(request):
     neighbors = Neighbors.objects.all()
+
     filename = request.GET.get('filename')
     if filename is None:
         filename = ''
     aggregate_list = []
     for neighbor in neighbors:
-        response = requests.get('http://{0}:{1}/api/v1/filelist'.format(neighbor.ip_address, neighbor.port))
+        response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
         print response.text
         response = json.loads(response.text)
         print response
@@ -67,7 +76,6 @@ def search_neighbor(request):
         # TODO tell user to enter a file
         return HttpResponseRedirect('/')
 
-    aggregate_list = {}
     response = ''
     for neighbor in neighbors:
         response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
@@ -90,6 +98,8 @@ def download_file(request):
 
     response = HttpResponse(raw_text, content_type='text/plain')
     response['Content-Disposition'] = 'attachment; filename={0}'.format(fileobj.name)
+
+    # TODO make it so files are downloaded to the /files/ dir in linux
 
     logging.debug("Response: {0}".format(response))
     return response
