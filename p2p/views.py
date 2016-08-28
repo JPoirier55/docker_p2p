@@ -53,7 +53,7 @@ def search_results(request):
             if filename in file['name']:
                 aggregate_list.append(file)
     return render(request, 'results1.html', {'files': aggregate_list,
-                                            'filename': filename})
+                                             'filename': filename})
 
 
 def search_page(request):
@@ -85,11 +85,10 @@ def download_file(request):
 
     if files is not None or len(files) != 0:
         default = files[0]
-        dir = os.getcwd()
-        raw_text = open(dir + '/p2p/static/files/' + default.name, 'r').read()
+        raw_text = open(default.location + default.name, 'rb').read()
 
         response = HttpResponse(raw_text, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        response['Content-Disposition'] = 'attachment; filename={0}'.format(default.name)
 
         logging.debug("Response: {0}".format(response))
         return response
