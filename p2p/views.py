@@ -81,16 +81,15 @@ def search_neighbor(request):
 
 def download_file(request):
     filename = request.GET.get('filename')
-    files = File.objects.filter(name=filename)
+    try:
+        fileobj = File.objects.get(name=filename)
+    except:
+        return HttpResponse('No such file')
 
-    if files is not None or len(files) != 0:
-        default = files[0]
-        raw_text = open(default.location + default.name, 'rb').read()
+    raw_text = open(fileobj.location + fileobj.name, 'rb').read()
 
-        response = HttpResponse(raw_text, content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(default.name)
+    response = HttpResponse(raw_text, content_type='text/plain')
+    response['Content-Disposition'] = 'attachment; filename={0}'.format(fileobj.name)
 
-        logging.debug("Response: {0}".format(response))
-        return response
-    else:
-        return HttpResponse('None')
+    logging.debug("Response: {0}".format(response))
+    return response
