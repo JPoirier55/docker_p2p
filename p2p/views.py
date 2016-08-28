@@ -29,6 +29,8 @@ def filelist_api(request):
     neighbors = Neighbors.objects.all()
     print 'NEIGHBORS', neighbors
     filename = request.GET.get('filename')
+    hop_number = int(request.GET.get('hop'))
+    hop_number += 1
     filelist = File.objects.all()
     json_response = []
     for file in filelist:
@@ -37,16 +39,16 @@ def filelist_api(request):
                               'category': file.category,
                               'host': host,
                               'port': port})
-    print 'First iteration:    ',json_response
     if filename is None:
         filename = ''
-    if len(neighbors) != 0:
+    if len(neighbors) != 0 and hop_number < 5:
         for neighbor in neighbors:
-            response = requests.get(
-                'http://{0}:{1}/api/v1/filelist?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
-            print response.text
+
+            response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address,
+                                                                                                 neighbor.port,
+                                                                                                 filename,
+                                                                                                 hop_number))
             response = json.loads(response.text)
-            print response
             for response_file in response:
                 if filename in response_file['name']:
                     json_response.append({'name': response_file['name'],
@@ -54,10 +56,6 @@ def filelist_api(request):
                                           'category': response_file['category'],
                                           'host': response_file['host'],
                                           'port': response_file['port']})
-    print 'seconf iteratoni:   ', json_response
-
-
-
 
     return HttpResponse(json.dumps(json_response))
 
