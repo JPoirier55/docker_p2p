@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>Results page</h1>
+    <table id="filetable"></table>
+
+<script>
+    $("#mybutton").click(function(){
+        var response_data = '';
+        var text = $("#inputbox").val();
+        $.ajax({
+          dataType: "json",
+          url: 'http://127.0.0.1:8000/api/v1/filelist?filename='+{{ filename }},
+          success: function(data){
+              response_data = data;
+              var new_table = '<tr><th>Filename</th><th>Category</th><th>Host:Port</th><th>Location</th></tr>';
+              for(i=0; i < response_data.length; i++){
+                new_table += "<tr>" +
+                        '<td>' +
+                        '<a href="http://'+response_data[i].host+":"+response_data[i].port+'/search?filename='+response_data[i].name+'">' +
+                            response_data[i].name +
+                        '</a></td>' +
+                        '<td>' + response_data[i].category + '</td>' +
+                        '<td>' + response_data[i].host + ":" + response_data[i].port +'</td>' +
+                        '<td>' + response_data[i].location +'</td>' +
+                        '</tr>';
+              }
+              $("#filetable").replaceWith(new_table);
+          }
+        });
+
+
+
+    });
+</script>
+</body>
+</html>

@@ -21,7 +21,9 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^$', views.index),
     url(r'^api/v1/filelist$', views.filelist_api),
-    url(r'^api/v1/file$', views.download_file),
-    url(r'^search$', views.search_neighbor),
+    url(r'^api/v1/download_file$', views.download_file),
+    url(r'^api/v1/search_neighbor$', views.search_neighbor),
+    url(r'^search_results$', views.search_results),
+    url(r'^search_page$', views.search_page),
 
 ]

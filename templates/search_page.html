@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body style="width:100%; margin-left:40%;">
+
+    <h1>Search</h1>
+
+<input id="inputbox" type="text" value="{{ filename }}"><br>
+<button id="mybutton">Click</button>
+<script>
+    $("#mybutton").click(function(){
+        var text = $("#inputbox").val();
+        console.log(text);
+        window.location.replace('http://127.0.0.1:8000/search_results?filename='+text)
+    });
+</script>
+</body>
+</html>

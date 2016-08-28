@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+    <h1>Results page</h1>
+    <table id="filetable">
+    <tr><th>Filename</th><th>Category</th><th>Host:Port</th><th>Location</th></tr>
+
+    {% for file in files %}
+    <tr>
+        <td><a href="/api/v1/download_file?filename={{ file.name }}">{{ file.name }}</a></td>
+        <td>{{ file.category }}</td>
+        <td>{{ file.host }}:{{ file.port }}</td>
+        <td>{{ file.location }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+    <a href="/search_page">Return</a>
+</body>
+</html>
