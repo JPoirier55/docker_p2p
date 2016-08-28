@@ -1,14 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body style="width:100%; margin-left:30%;">
+{% include 'index.html' %}
+{% block content %}
+    <title>Results</title>
 
-    <h1>Results page</h1>
+    <div id="summary">
+        <h2>Searching for: [{{ filename }}]</h2>
+    </div>
+
     <table id="filetable">
+    <tr>
+        <th>
+            <a href="/search_page">Return</a>
+        </th>
+    </tr>
     <tr><th>Filename</th>
         <th>Category</th>
         <th>Host:Port</th>
@@ -24,6 +27,6 @@
     </tr>
     {% endfor %}
     </table>
-    <a href="/search_page">Return</a>
-</body>
-</html>
+
+
+{% endblock %}
