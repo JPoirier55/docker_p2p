@@ -3,9 +3,7 @@ import json
 from django.http import HttpResponse, HttpResponseRedirect
 import requests
 from models import File, Neighbors
-import tarfile
 import logging
-import os
 
 # Create your views here.
 
@@ -62,19 +60,20 @@ def filelist_api(request):
 
 def search_results(request):
     neighbors = Neighbors.objects.all()
-
+    host, port = request.META['HTTP_HOST'].split(':')
     filename = request.GET.get('filename')
+    hop_number = int(request.GET.get('hop', '0'))
     if filename is None:
         filename = ''
     aggregate_list = []
     for neighbor in neighbors:
-        response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
-        print response.text
+        response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address, neighbor.port, filename, hop_number))
         response = json.loads(response.text)
-        print response
         for file in response:
             if filename in file['name']:
-                aggregate_list.append(file)
+                if file not in aggregate_list:
+                    if (file['host'], file['port']) != (host, port):
+                        aggregate_list.append(file)
     return render(request, 'results1.html', {'files': aggregate_list,
                                              'filename': filename})
 
