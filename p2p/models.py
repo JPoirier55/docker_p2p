@@ -3,6 +3,12 @@ from django.db import models
 # Create your models here.
 
 
+class FileManager(models.Manager):
+    def create_file(self, name, location):
+        file = self.create(name=name, location=location)
+        return file
+
+
 class File(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=256)
@@ -25,6 +31,8 @@ class File(models.Model):
         default=FICTION,
     )
     location = models.CharField(max_length=256)
+
+    objects = FileManager()
 
     def __str__(self):
         return '{0}-{1}-{2}-{3}'.format(str(self.id), self.name, self.category, self.location)

@@ -1,0 +1,16 @@
+{% include 'index.html' %}
+{% block content %}
+    <title>Local</title>
+   <table id="filetable">
+    <tr>
+        <th>Added Files</th>
+    </tr>
+
+    {% for file in files %}
+    <tr>
+        <td>{{ file }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}
