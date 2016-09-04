@@ -1,12 +1,11 @@
 from django.shortcuts import render
 import json
-import sys
 from django.http import HttpResponse, HttpResponseRedirect
 import requests
 from models import File, Neighbors
 import logging
 from management import syncdb
-# Create your views here.
+import socket
 
 
 def index(request):
@@ -15,11 +14,25 @@ def index(request):
     return render(request, 'index.html')
 
 
+def local_files(request):
+    json_response = []
+    filelist = File.objects.all()
+    for file in filelist:
+        json_response.append({'name': file.name,
+                              'location': file.location,
+                              'category': file.category,
+                              'host': 'localhost',
+                              })
+
+    return render(request, 'local_files.html', {'files': json_response})
+
+
 def search_results(request):
     neighbors = Neighbors.objects.all()
     host, port = request.META['HTTP_HOST'].split(':')
     filename = request.GET.get('filename')
     hop_number = int(request.GET.get('hop', '0'))
+    host_local = socket.gethostbyname(socket.gethostname())
     if filename is None:
         filename = ''
     aggregate_list = []
@@ -30,7 +43,7 @@ def search_results(request):
             for file in response:
                 if filename in file['name']:
                     if file not in aggregate_list:
-                        if (file['host'], file['port']) != (host, port):
+                        if (file['host'], file['port']) != (host, port) and file['host'] != host_local:
                             aggregate_list.append(file)
         except requests.exceptions.RequestException as e:
             print "Error: Cannot access {0}:{1} -- {2}".format(neighbor.ip_address, neighbor.port, e)

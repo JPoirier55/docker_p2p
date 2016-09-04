@@ -1,0 +1,21 @@
+{% include 'index.html' %}
+{% block content %}
+    <title>Local</title>
+   <table id="filetable">
+    <tr><th>Filename</th>
+        <th>Category</th>
+        <th>Host</th>
+        <th>Location</th>
+    </tr>
+
+    {% for file in files %}
+    <tr>
+        <td>{{ file.name }}</td>
+        <td>{{ file.category }}</td>
+        <td>{{ file.host }}</td>
+        <td>{{ file.location }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+
+{% endblock %}
