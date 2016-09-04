@@ -1,14 +1,17 @@
 from django.shortcuts import render
 import json
+import sys
 from django.http import HttpResponse, HttpResponseRedirect
 import requests
 from models import File, Neighbors
 import logging
-
+from management import syncdb
 # Create your views here.
 
 
 def index(request):
+    syncdb.sync_files()
+    print request.META['HTTP_HOST']
     return render(request, 'index.html')
 
 
@@ -21,13 +24,18 @@ def search_results(request):
         filename = ''
     aggregate_list = []
     for neighbor in neighbors:
-        response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address, neighbor.port, filename, hop_number))
-        response = json.loads(response.text)
-        for file in response:
-            if filename in file['name']:
-                if file not in aggregate_list:
-                    if (file['host'], file['port']) != (host, port):
-                        aggregate_list.append(file)
+        try:
+            response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address, neighbor.port, filename, hop_number), timeout=5)
+            response = json.loads(response.text)
+            for file in response:
+                if filename in file['name']:
+                    if file not in aggregate_list:
+                        if (file['host'], file['port']) != (host, port):
+                            aggregate_list.append(file)
+        except requests.exceptions.RequestException as e:
+            print "Error: Cannot access {0}:{1} -- {2}".format(neighbor.ip_address, neighbor.port, e)
+            continue
+
     return render(request, 'results1.html', {'files': aggregate_list,
                                              'filename': filename})
 
@@ -93,18 +101,21 @@ def filelist_api(request):
         filename = ''
     if len(neighbors) != 0 and hop_number < 5:
         for neighbor in neighbors:
-
-            response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address,
-                                                                                                 neighbor.port,
-                                                                                                 filename,
-                                                                                                 hop_number))
-            response = json.loads(response.text)
-            for response_file in response:
-                if filename in response_file['name']:
-                    json_response.append({'name': response_file['name'],
-                                          'location': response_file['location'],
-                                          'category': response_file['category'],
-                                          'host': response_file['host'],
-                                          'port': response_file['port']})
+            try:
+                response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address,
+                                                                                                     neighbor.port,
+                                                                                                     filename,
+                                                                                                     hop_number))
+                response = json.loads(response.text)
+                for response_file in response:
+                    if filename in response_file['name']:
+                        json_response.append({'name': response_file['name'],
+                                              'location': response_file['location'],
+                                              'category': response_file['category'],
+                                              'host': response_file['host'],
+                                              'port': response_file['port']})
+            except requests.exceptions.RequestException as e:
+                print "Error: Cannot access {0}:{1} -- {2}".format(neighbor.ip_address, neighbor.port, e)
+                continue
 
     return HttpResponse(json.dumps(json_response))
