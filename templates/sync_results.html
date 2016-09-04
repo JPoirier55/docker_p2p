@@ -6,11 +6,22 @@
         <th>Added Files</th>
     </tr>
 
-    {% for file in files %}
+    {% for file in added_files %}
     <tr>
         <td>{{ file }}</td>
     </tr>
     {% endfor %}
     </table>
+    <table id="filetable">
+    <br>
+    <tr>
+        <th>Removed Files</th>
+    </tr>
 
+    {% for file in removed_files %}
+    <tr>
+        <td>{{ file }}</td>
+    </tr>
+    {% endfor %}
+    </table>
 {% endblock %}

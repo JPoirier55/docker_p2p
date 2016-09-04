@@ -76,8 +76,9 @@ def search_neighbor(request):
 # ---------------API SECTION-------------------------
 
 def sync_files(request):
-    synced_files = syncdb.sync_files()
-    return render(request, 'sync_results.html', {'files': synced_files})
+    added_files, removed_files = syncdb.sync_files()
+    return render(request, 'sync_results.html', {'added_files': added_files,
+                                                 'removed_files': removed_files})
 
 
 def download_file(request):

@@ -1,10 +1,11 @@
 import os
 
-from p2p.models import File, FileManager, Neighbors
+from p2p.models import File
 
 
 def sync_files():
-    synced_files = []
+    added_files = []
+    removed_files = []
     file_dir = os.environ['P2P_FILE_DIR']
     for root, dirs, files in os.walk(file_dir):
         print root, dirs, files
@@ -14,9 +15,11 @@ def sync_files():
             except:
                 print 'Creating new file: ', file
                 File.objects.create_file(file, root)
-                synced_files.append(file)
+                added_files.append(file)
                 continue
-    return synced_files
-
-
-
+        for file in File.objects.all():
+            if file.name not in files:
+                print 'Deleting file: ', file.name
+                removed_files.append(file.name)
+                file.delete()
+    return added_files, removed_files
