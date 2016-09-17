@@ -121,7 +121,7 @@ def filelist_api(request):
                 response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address,
                                                                                                      neighbor.port,
                                                                                                      filename,
-                                                                                                     hop_number))
+                                                                                                     hop_number), timeout=5)
                 response = json.loads(response.text)
                 for response_file in response:
                     if filename in response_file['name']:
