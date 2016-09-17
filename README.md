@@ -1,5 +1,14 @@
 # Containerized peer to peer network
 
+### Dev env use
+```
+ git clone https://github.com/jpoirier55/docker_p2p
+ cd docker_p2p
+ python manage.py makemigrations
+ python manage.py migrate
+ python manage.py runserver 0.0.0.0:8000
+```
+
 ### Overview
 This project is an undergraduate research project for Colorado State University Dept. of Electrical and Computer Engineering. Docker containers allow for separation and deployment completely independent of the underlying operating system. This allows for users to pack up, ship and move entire applications without having to reconfigure dependencies and source. 
 
