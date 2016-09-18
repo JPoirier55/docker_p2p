@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 
 def index(request):
-    return render(request, 'index.html')
+    return render(request, 'upload.html')
 
 
 def local_files(request):

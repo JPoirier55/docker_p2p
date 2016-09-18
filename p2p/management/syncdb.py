@@ -21,4 +21,4 @@ def sync_files():
                 print 'Deleting file: ', file.name
                 removed_files.append(file.name)
                 file.delete()
-
+    return added_files, removed_files

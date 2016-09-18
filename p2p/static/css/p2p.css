@@ -5,7 +5,6 @@
 #filetable{
     text-align:center;
     width:80%;
-    margin-left:10%;
     font-size:1.5vw;
 }
 table {
@@ -17,10 +16,12 @@ th, td {
     text-align: left;
     border-bottom: 1px solid #ddd;
 }
+th{
+    background-color: lightsteelblue;
+}
 #summary{
     text-align:center;
     width:80%;
-    margin-left:10%;
     font-size:1.5vw;
     border: 1px solid lightgray;
 }
@@ -28,23 +29,19 @@ th, td {
 /****************Search page ****************/
 
 #inputbox{
-    text-align:left;
     width:25%;
-    margin-left:10%;
     font-size:1.5vw;
+    margin: 2%;
 }
 #mybutton{
-    margin: 1% 1% 1% 10%;
-
     padding: 1% 2% 1% 2%;
 }
-#searchHeader{
-    margin-left:10%;
-}
+
 
 /*****************upload files ***************/
-.upload_filebox{
+.common_back{
+    padding:5%;
     margin-top:5%;
-    margin-left: 5%;
     font-size:1.2vw;
+    background-color: #D2EFEF;
 }

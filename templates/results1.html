@@ -1,7 +1,7 @@
 {% include 'index.html' %}
 {% block content %}
     <title>Results</title>
-
+    <div class="upload_filebox" align="center">
     <div id="summary">
         <h2>Searching for: [{{ filename }}]</h2>
     </div>
@@ -27,6 +27,7 @@
     </tr>
     {% endfor %}
     </table>
+    </div>
 
 
 {% endblock %}
