@@ -8,7 +8,6 @@ def sync_files():
     removed_files = []
     file_dir = os.environ['P2P_FILE_DIR']
     for root, dirs, files in os.walk(file_dir):
-        print root, dirs, files
         for file in files:
             try:
                 File.objects.get(name=file)
@@ -22,4 +21,4 @@ def sync_files():
                 print 'Deleting file: ', file.name
                 removed_files.append(file.name)
                 file.delete()
-    return added_files, removed_files
+

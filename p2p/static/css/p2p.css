@@ -41,3 +41,10 @@ th, td {
 #searchHeader{
     margin-left:10%;
 }
+
+/*****************upload files ***************/
+.upload_filebox{
+    margin-top:5%;
+    margin-left: 5%;
+    font-size:1.2vw;
+}
