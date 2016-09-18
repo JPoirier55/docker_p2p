@@ -149,7 +149,7 @@ def upload_file(request):
     if request.method != 'POST':
         return HttpResponseBadRequest('Only POST requests are allowed')
     file = request.FILES['myfile']
-    with open('C:\\Users\\Jake\\Downloads\\%s' % file.name, 'wb+') as dest:
+    with open('/files/%s' % file.name, 'wb+') as dest:
         for chunk in file.chunks():
             dest.write(chunk)
     added_files, removed_files = syncdb.sync_files()
