@@ -1,11 +1,13 @@
 from django.shortcuts import render
 import json
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 import requests
 from models import File, Neighbors
 import logging
 from management import syncdb
 import socket
+from django.views.decorators.csrf import csrf_exempt
+
 
 
 def index(request):
@@ -73,6 +75,11 @@ def search_neighbor(request):
     return response
 
 
+@csrf_exempt
+def upload_page(request):
+    return render(request, 'upload.html')
+
+
 # ---------------API SECTION-------------------------
 
 def sync_files(request):
@@ -135,3 +142,14 @@ def filelist_api(request):
                 continue
 
     return HttpResponse(json.dumps(json_response))
+
+
+@csrf_exempt
+def upload_file(request):
+    if request.method != 'POST':
+        return HttpResponseBadRequest('Only POST requests are allowed')
+    file = request.FILES['myfile']
+    with open('/files/%s' % file.name, 'wb+') as dest:
+        for chunk in file.chunks():
+            dest.write(chunk)
+    return HttpResponse('File uploaded')

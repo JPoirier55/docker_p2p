@@ -1,0 +1,22 @@
+{% include 'index.html' %}
+{% block content %}
+    <title>Results</title>
+<form method="post" action="upload_file()">
+                <input type="file" name="foofile">
+                <input type="submit" value="Upload">
+            </form>
+
+
+
+<div id="fileuploader">Upload</div>
+<script>
+$(document).ready(function()
+{
+	$("#fileuploader").uploadFile({
+	url:"/api/v1/upload",
+	fileName:"myfile"
+	});
+});
+</script>
+
+{% endblock %}
