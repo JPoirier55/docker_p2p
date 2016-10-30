@@ -29,4 +29,7 @@ urlpatterns = [
     url(r'^api/v1/sync$', views.sync_files),
     url(r'^upload$', views.upload_page),
     url(r'^api/v1/upload$', views.upload_file),
+    url(r'^test$', views.test_page),
+    url(r'^api/v1/test$', views.test_api),
+
 ]

@@ -36,15 +36,7 @@ def create_server(ip, portnum):
                 header += d
 
             filename = header.split(" ")[1]
-            print filename
             filesize = int(header.split(" ")[2])
-            chunk = 1024
-            if filesize > 1024:
-                chunk = filesize/1024
-
-
-
-            """ Read filename that is placed in the header of the file """
 
             file = open(filename, "wb+")
 
