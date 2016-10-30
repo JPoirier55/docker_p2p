@@ -20,7 +20,9 @@
 
     {% for file in files %}
     <tr>
-        <td><a href="http://{{ file.host }}:{{ file.port }}/api/v1/download_file?filename={{ file.name }}">{{ file.name }}</a></td>
+        <td>
+            <a href="http://{{ file.host }}:{{ file.port }}/api/v1/download_tcp?filename={{ file.name }}&ip={{ host }}&port={{ port }}">{{ file.name }}</a>
+        </td>
         <td>{{ file.category }}</td>
         <td>{{ file.host }}:{{ file.port }}</td>
         <td>{{ file.location }}</td>

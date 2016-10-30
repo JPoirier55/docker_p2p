@@ -36,9 +36,10 @@ def create_server(ip, portnum):
                 header += d
 
             filename = header.split(" ")[1]
+            cleanfilename = filename.split("/")[-1]
             filesize = int(header.split(" ")[2])
 
-            file = open(filename, "wb+")
+            file = open('/files/{0}'.format(cleanfilename), "wb+")
 
             while True:
                 """ Receive file in only 256 byte chunks """

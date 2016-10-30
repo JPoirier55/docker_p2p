@@ -51,7 +51,9 @@ def search_results(request):
             continue
 
     return render(request, 'results1.html', {'files': aggregate_list,
-                                             'filename': filename})
+                                             'filename': filename,
+                                             'host': host,
+                                             'port': port})
 
 
 def search_page(request):
@@ -95,6 +97,20 @@ def test_api(request):
     client.client_send(ip, '65000', 'test.txt')
 
     return HttpResponseRedirect("/test")
+
+
+def download_file_tcp(request):
+    filename = request.GET.get('filename')
+    ip = request.GET.get('ip')
+    port = request.GET.get('port')
+    try:
+        fileobj = File.objects.get(name=filename)
+    except:
+        return HttpResponse('No such file')
+
+    client.client_send(ip, port, fileobj.location)
+    return HttpResponseRedirect("Bing fuckio")
+
 
 def sync_files(request):
     added_files, removed_files = syncdb.sync_files()
