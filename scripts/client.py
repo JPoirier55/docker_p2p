@@ -42,12 +42,11 @@ def client_send(ip, portnum, inputfile):
         while True:
             """ Receive file in only 256 byte chunks """
             data = sock.recv(256)
-            if data == '###File not found exception###':
-                break
-            else:
+            if '###File not found exception###' in data:
                 file.close()
+                break
 
-            if data:
+            elif data:
                 print "Receiving: ", data
                 file.write(data)
 

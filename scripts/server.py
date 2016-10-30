@@ -46,6 +46,7 @@ def create_server(ip, portnum):
                         file.close()
                         break
                     else:
+                        connection.sendall("FILE: {0} {1}\n".format(filename, 0))
                         connection.sendall("###File not found exception###")
                         break
                 header += d
