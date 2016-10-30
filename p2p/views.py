@@ -103,13 +103,9 @@ def download_file_tcp(request):
     filename = request.GET.get('filename')
     ip = request.GET.get('ip')
     port = request.GET.get('port')
-    try:
-        fileobj = File.objects.get(name=filename)
-    except:
-        return HttpResponse('No such file')
 
-    client.client_send(ip, port, fileobj.location+fileobj.name)
-    return HttpResponseRedirect('/search_results?filename='+filename)
+    client.client_send(ip, port, filename)
+    return HttpResponseRedirect('/search_results')
 
 
 def sync_files(request):

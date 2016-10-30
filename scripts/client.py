@@ -31,18 +31,18 @@ def client_send(ip, portnum, inputfile):
             if d == '\n':
                 break
             header += d
-            print header
 
         filename = header.split(" ")[1]
         cleanfilename = filename.split("/")[-1]
         filesize = int(header.split(" ")[2])
 
-        file = open(inputfile, "wb+")
+        file = open(filename, "wb+")
 
         while True:
             """ Receive file in only 256 byte chunks """
             data = sock.recv(256)
             if '###File not found exception###' in data:
+                print 'file not found'
                 file.close()
                 break
 
