@@ -108,8 +108,8 @@ def download_file_tcp(request):
     except:
         return HttpResponse('No such file')
 
-    client.client_send(ip, port, fileobj.location+"/"+fileobj.name)
-    return HttpResponseRedirect("Bing fuckio")
+    client.client_send(ip, port, fileobj.location+fileobj.name)
+    return HttpResponseRedirect('/search_results?filename='+filename)
 
 
 def sync_files(request):
