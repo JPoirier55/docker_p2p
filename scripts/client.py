@@ -1,6 +1,7 @@
 import socket
 import sys
 import argparse
+import os
 
 def client_send(ip, portnum, inputfile):
     """
@@ -24,6 +25,7 @@ def client_send(ip, portnum, inputfile):
 
         """ Open file and read 256 bytes at a time, as well as filename """
         file = open(inputfile, 'rb')
+        sock.send("FILE: {0} {1}\n".format(inputfile, os.stat(inputfile).st_size))
         readfile = file.read(256)
         while readfile:
             sock.send(readfile)
