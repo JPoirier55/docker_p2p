@@ -1,7 +1,7 @@
 import socket
 import argparse
 import sys
-
+import re
 
 def create_server(ip, portnum):
     """
@@ -22,23 +22,36 @@ def create_server(ip, portnum):
 
     """ listen to any incoming connections from client """
     sock.listen(1)
-
     while True:
-
         print "Waiting for client connection...."
         connection, client_address = sock.accept()
         try:
+
             print 'Connection from: ', client_address
+            header = ""
+            while True:
+                d = connection.recv(1)
+                if d == '\n':
+                    break
+                header += d
+
+            filename = header.split(" ")[1]
+            print filename
+            filesize = int(header.split(" ")[2])
+            chunk = 1024
+            if filesize > 1024:
+                chunk = filesize/1024
+
+
 
             """ Read filename that is placed in the header of the file """
 
-            file = open("picture.jpg", "wb")
+            file = open(filename, "wb+")
 
             while True:
-
                 """ Receive file in only 256 byte chunks """
                 data = connection.recv(256)
-
+                print data
                 if data:
                     print "Receiving: ", data
                     file.write(data)
