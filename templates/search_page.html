@@ -1,16 +1,17 @@
 {% include 'index.html' %}
 {% block content %}
+    <div class="common_back" align="center">
+        <h1 id="searchHeader">Search</h1>
 
-    <h1 id="searchHeader">Search</h1>
-
-<input id="inputbox" type="text" value="{{ filename }}"><br>
-<button class="btn btn-warning" id="mybutton">Submit</button>
-<script>
-    $("#mybutton").click(function(){
-        var text = $("#inputbox").val();
-        console.log(text);
-        var host = window.location.host;
-        window.location.replace('http://'+host+'/search_results?filename='+text)
-    });
-</script>
+        <input id="inputbox" type="text" value="{{ filename }}"><br>
+        <button class="btn btn-warning" id="mybutton">Submit</button>
+        <script>
+            $("#mybutton").click(function(){
+                var text = $("#inputbox").val();
+                console.log(text);
+                var host = window.location.host;
+                window.location.replace('http://'+host+'/search_results?filename='+text)
+            });
+        </script>
+    </div>
 {% endblock %}

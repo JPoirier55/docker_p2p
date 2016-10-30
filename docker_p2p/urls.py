@@ -27,5 +27,6 @@ urlpatterns = [
     url(r'^search_page$', views.search_page),
     url(r'^local_files$', views.local_files),
     url(r'^api/v1/sync$', views.sync_files),
-
+    url(r'^upload$', views.upload_page),
+    url(r'^api/v1/upload$', views.upload_file),
 ]
