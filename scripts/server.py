@@ -34,20 +34,26 @@ def create_server(ip, portnum):
                 d = connection.recv(1)
                 if d == '\n':
                     filename = header.split(" ")[1]
-                    file = open(filename, 'rb')
-                    connection.sendall("FILE: {0} {1}\n".format(filename, os.stat(filename).st_size))
-                    readfile = file.read(16)
-                    while readfile:
-                        connection.sendall(readfile)
-                        readfile = file.read(16)
+                    if os.path.isfile(filename):
+                        file = open(filename, 'rb')
 
-                    file.close()
-                    break
+                        connection.sendall("FILE: {0} {1}\n".format(filename, os.stat(filename).st_size))
+                        readfile = file.read(256)
+                        while readfile:
+                            connection.sendall(readfile)
+                            readfile = file.read(256)
+
+                        file.close()
+                        break
+                    else:
+                        connection.sendall("###File not found exception###")
+                        break
                 header += d
 
 
         finally:
             connection.close()
+
 
 
 def main():
