@@ -8,6 +8,7 @@ from management import syncdb
 import socket
 from django.views.decorators.csrf import csrf_exempt
 
+from scripts import client
 
 
 def index(request):
@@ -50,7 +51,9 @@ def search_results(request):
             continue
 
     return render(request, 'results1.html', {'files': aggregate_list,
-                                             'filename': filename})
+                                             'filename': filename,
+                                             'host': host,
+                                             'port': port})
 
 
 def search_page(request):
@@ -80,7 +83,33 @@ def upload_page(request):
     return render(request, 'upload.html')
 
 
+def test_page(request):
+    ip = '172.17.0.3'
+    file = 'test.txt'
+    return render(request, "test.html", {'file': file})
+
+
 # ---------------API SECTION-------------------------
+
+def test_api(request):
+
+    ip = '172.17.0.1'
+    client.client_send(ip, '65000', 'test.txt')
+
+    return HttpResponseRedirect("/test")
+
+
+def download_file_tcp(request):
+    filename = request.GET.get('filename')
+    ip = request.GET.get('ip')
+    port = request.GET.get('port')
+
+    client.client_send(ip, port, filename)
+    added_files, removed_files = syncdb.sync_files()
+    print added_files
+    print removed_files
+    return HttpResponseRedirect('/search_results')
+
 
 def sync_files(request):
     added_files, removed_files = syncdb.sync_files()

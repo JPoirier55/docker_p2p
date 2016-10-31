@@ -23,37 +23,15 @@ def client_send(ip, portnum, inputfile):
 
     try:
 
-        sock.send("FILE: {0}\n".format(inputfile))
+        """ Open file and read 256 bytes at a time, as well as filename """
+        file = open(inputfile, 'rb')
+        sock.send("FILE: {0} {1}\n".format(inputfile, os.stat(inputfile).st_size))
+        readfile = file.read(256)
+        while readfile:
+            sock.send(readfile)
+            readfile = file.read(256)
 
-        header = ""
-        while True:
-            d = sock.recv(1)
-            if d == '\n':
-                break
-            header += d
-
-        filename = header.split(" ")[1]
-        cleanfilename = filename.split("/")[-1]
-        filesize = int(header.split(" ")[2])
-
-        file = open(filename, "wb+")
-
-        while True:
-            """ Receive file in only 256 byte chunks """
-            data = sock.recv(256)
-            if '###File not found exception###' in data:
-                print 'file not found'
-                file.close()
-                break
-
-            elif data:
-                print "Receiving: ", data
-                file.write(data)
-
-            else:
-                print "End of file, closing..."
-                file.close()
-                break
+        file.close()
 
     finally:
         sock.close()

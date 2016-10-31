@@ -23,5 +23,3 @@ sudo apt-get update
 sudo apt-get install docker-engine
 
 sudo usermod -aG docker ubuntu
-
-
