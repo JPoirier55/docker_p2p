@@ -105,6 +105,9 @@ def download_file_tcp(request):
     port = request.GET.get('port')
 
     client.client_send(ip, port, filename)
+    added_files, removed_files = syncdb.sync_files()
+    print added_files
+    print removed_files
     return HttpResponseRedirect('/search_results')
 
 
