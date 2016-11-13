@@ -14,10 +14,12 @@ class SplitFile(models.Model):
     name = models.CharField(max_length=256)
     node1 = models.GenericIPAddressField(protocol='IPv4')
     node2 = models.GenericIPAddressField(protocol='IPv4')
+    port1 = models.IntegerField(default=65000)
+    port2 = models.IntegerField(default=65001)
     objects = FileManager()
 
     def __str__(self):
-        return '{0}-{1}-{2}-{3}'.format(str(self.id), self.name, self.node1, self.node2)
+        return '{0}-{1}-{2}:{3}-{4}:{5}'.format(str(self.id), self.name, self.node1, self.port1, self.node2, self.port2)
 
 
 class File(models.Model):

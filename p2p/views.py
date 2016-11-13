@@ -101,12 +101,15 @@ def test_api(request):
 
 
 def download_split_tcp(request):
-    filename = request.GET.get('filename')
+    filename = request.GET.get('filename', 'test')
     try:
         fileobj = SplitFile.objects.get(name=filename)
+        client.client_send(fileobj.node1, fileobj.port1, '/files/split1.txt')
+        client.client_send(fileobj.node2, fileobj.port2, '/files/split2.txt')
+
+        return HttpResponseRedirect('/')
     except:
         return HttpResponse('No such file')
-
 
 
 def download_file_tcp(request):

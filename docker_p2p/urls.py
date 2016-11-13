@@ -32,5 +32,6 @@ urlpatterns = [
     url(r'^test$', views.test_page),
     url(r'^api/v1/download_tcp$', views.download_file_tcp),
     url(r'^api/v1/test$', views.test_api),
+    url(r'^api/v1/split$', views.download_split_tcp),
 
 ]
