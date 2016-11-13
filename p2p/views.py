@@ -2,7 +2,7 @@ from django.shortcuts import render
 import json
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 import requests
-from models import File, Neighbors
+from models import File, Neighbors, SplitFile
 import logging
 from management import syncdb
 import socket
@@ -97,6 +97,15 @@ def test_api(request):
     client.client_send(ip, '65000', 'test.txt')
 
     return HttpResponseRedirect("/test")
+
+
+def download_split_tcp(request):
+    filename = request.GET.get('filename')
+    try:
+        fileobj = SplitFile.objects.get(name=filename)
+    except:
+        return HttpResponse('No such file')
+
 
 
 def download_file_tcp(request):

@@ -9,6 +9,17 @@ class FileManager(models.Manager):
         return file
 
 
+class SplitFile(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=256)
+    node1 = models.GenericIPAddressField(protocol='IPv4')
+    node2 = models.GenericIPAddressField(protocol='IPv4')
+    objects = FileManager()
+
+    def __str__(self):
+        return '{0}-{1}-{2}-{3}'.format(str(self.id), self.name, self.node1, self.node2)
+
+
 class File(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=256)
