@@ -12,6 +12,7 @@ from scripts import client
 
 
 def index(request):
+    syncdb.sync_files()
     return render(request, 'upload.html')
 
 

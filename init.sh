@@ -1,6 +1,8 @@
 #!/bin/bash
 
-python manage.py makemigrations
-python manage.py migrate
-echo "Creating database user, requires input:"
-python manage.py createsuperuser
+#ip addr | grep 'state UP' -A2 | tail -n1 | awk '{print $2}' | cut -f1  -d'/'
+
+echo $INSTANCE
+
+
+#python /docker_p2p/scripts/server.py --serverip
