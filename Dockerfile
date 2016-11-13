@@ -13,4 +13,6 @@ RUN mkdir /files/
 ENV DJANGO_VERSION 1.10.1
 ENV P2P_FILE_DIR /files/
 
+RUN apt-get update && apt-get install -y git
+
 RUN pip install requests mysqlclient psycopg2 django=="$DJANGO_VERSION"
