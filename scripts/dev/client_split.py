@@ -6,10 +6,12 @@
     November 1, 2016
 """
 
+
 import socket
 import sys
 import argparse
 import os
+
 
 def client_send(ip, portnum, inputfile):
     """

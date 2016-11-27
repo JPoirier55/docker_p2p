@@ -10,7 +10,7 @@
 import socket
 import argparse
 import sys
-import re
+import os
 
 
 def create_server(ip, portnum):
@@ -37,31 +37,29 @@ def create_server(ip, portnum):
         connection, client_address = sock.accept()
         try:
 
-            print 'Connection from: ', client_address
+            """ Receive file in only 256 byte chunks """
+
             header = ""
             while True:
                 d = connection.recv(1)
                 if d == '\n':
-                    break
+                    filename = header.split(" ")[1]
+                    if os.path.isfile(filename):
+                        file = open(filename, 'rb')
+
+                        connection.sendall("FILE: {0} {1}\n".format(filename, os.stat(filename).st_size))
+                        readfile = file.read(256)
+                        while readfile:
+                            connection.sendall(readfile)
+                            readfile = file.read(256)
+
+                        file.close()
+                        break
+                    else:
+                        connection.sendall("FILE: {0} {1}\n".format(filename, 0))
+                        connection.sendall("###File not found exception###")
+                        break
                 header += d
-
-            filename = header.split(" ")[1]
-            cleanfilename = filename.split("/")[-1]
-
-            file = open('/files/{0}'.format(cleanfilename), "wb+")
-
-            while True:
-                """ Receive file in only 256 byte chunks """
-                data = connection.recv(256)
-                print data
-                if data:
-                    print "Receiving: ", data
-                    file.write(data)
-
-                else:
-                    print "End of file, closing..."
-                    file.close()
-                    break
 
         finally:
             connection.close()

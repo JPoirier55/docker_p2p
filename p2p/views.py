@@ -1,22 +1,41 @@
+"""
+    Docker peer to peer network
+    Author: Jake Poirier
+    ECE495 Independent study project
+    Colorado State University
+    November 1, 2016
+"""
+
 from django.shortcuts import render
 import json
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
-import requests
-from models import File, Neighbors, SplitFile
-import logging
+from django.http import HttpResponse, HttpResponseRedirect
+from models import File, SplitFile
 from management import syncdb
-import socket
+import search_methods
+import file_methods
+import os
 from django.views.decorators.csrf import csrf_exempt
 
 from scripts import client
 
 
 def index(request):
+    """
+    Main page to upload documents
+    :param request: wsgi request
+    :return: render upload page
+    """
     syncdb.sync_files()
     return render(request, 'upload.html')
 
 
 def local_files(request):
+    """
+    Lists files on the system/container locally
+    in whatever directory is preset - default is /files/
+    :param request: wsgi request
+    :return: render local_files page with file list
+    """
     json_response = []
     filelist = File.objects.all()
     for file in filelist:
@@ -30,27 +49,21 @@ def local_files(request):
 
 
 def search_results(request):
-    neighbors = Neighbors.objects.all()
-    host, port = request.META['HTTP_HOST'].split(':')
-    filename = request.GET.get('filename')
-    hop_number = int(request.GET.get('hop', '0'))
-    host_local = socket.gethostbyname(socket.gethostname())
-    if filename is None:
-        filename = ''
-    aggregate_list = []
-    for neighbor in neighbors:
-        try:
-            response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address, neighbor.port, filename, hop_number), timeout=5)
-            response = json.loads(response.text)
-            for file in response:
-                if filename in file['name']:
-                    if file not in aggregate_list:
-                        if (file['host'], file['port']) != (host, port) and file['host'] != host_local:
-                            aggregate_list.append(file)
-        except requests.exceptions.RequestException as e:
-            print "Error: Cannot access {0}:{1} -- {2}".format(neighbor.ip_address, neighbor.port, e)
-            continue
-
+    """
+    Page that shows all files on neighboring nodes.
+    Does a depth first search across nodes with GET requests,
+    combines all known files local to those systems, and
+    flushes any files that are local to the system doing the
+    initial calling.
+    There is a set default maximum of 5 hops, which is calculated
+    within the filelist API for each node.
+    Neighboring nodes must be added to django admin database to
+    allow any searching. See future work/improvements page on
+    github at https://github.com/JPoirier55/docker_p2p/wiki/Future-work-and-improvements
+    :param request: wsgi request
+    :return: render results page with filelist and meta data
+    """
+    aggregate_list, filename, host, port = search_methods.search_neighbors(request)
     return render(request, 'results1.html', {'files': aggregate_list,
                                              'filename': filename,
                                              'host': host,
@@ -58,33 +71,44 @@ def search_results(request):
 
 
 def search_page(request):
+    """
+    Simple page to search for files by name,
+    redirect within javascript
+    :param request: wsgi request
+    :return: render search page
+    """
     return render(request, 'search_page.html')
 
 
 def search_neighbor(request):
-    neighbors = Neighbors.objects.all()
-    filename = request.GET.get('filename')
-    if filename is None:
-        # TODO tell user to enter a file
-        return HttpResponseRedirect('/')
-
-    response = ''
-    for neighbor in neighbors:
-        response = requests.get('http://{0}:{1}/api/v1/file?filename={2}'.format(neighbor.ip_address, neighbor.port, filename))
-        if response.text != 'None':
-
-            response = HttpResponse(response.content, content_type='text/plain')
-            response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
-
+    """
+    Deprecated method that previously searched nodes and
+    allowed for downloading the files searched for directly
+    to the machine that was loading the page
+    :param request: wsgi request
+    :return: response with file object
+    """
+    response = search_methods.search_neighbor_single(request)
     return response
 
 
 @csrf_exempt
 def upload_page(request):
+    """
+    Main home page that allows for uploading
+    documents to the node/system
+    :param request: wsgi request
+    :return: render upload page
+    """
     return render(request, 'upload.html')
 
 
 def test_page(request):
+    """
+    TESTING downloads
+    :param request:
+    :return:
+    """
     ip = '172.17.0.3'
     file = 'test.txt'
     return render(request, "test.html", {'file': file})
@@ -93,7 +117,11 @@ def test_page(request):
 # ---------------API SECTION-------------------------
 
 def test_api(request):
-
+    """
+    TESTING tcp connection between nodes
+    :param request:
+    :return:
+    """
     ip = '172.17.0.1'
     client.client_send(ip, '65000', 'test.txt')
 
@@ -101,96 +129,100 @@ def test_api(request):
 
 
 def download_split_tcp(request):
-    filename = request.GET.get('filename')
+    """
+    Method for splitting file across different connected
+    nodes. Purpose is to allow a master node which can be accessed
+    by the hosting system, to upload and download files that are
+    split up, and encrypted with different keys for each piece.
+    :param request: wsgi request
+    :return: redirect
+    """
+    filename = request.GET.get('filename', 'test')
     try:
         fileobj = SplitFile.objects.get(name=filename)
+        file1 = '/files/first_'+filename
+        file2 = '/files/second_'+filename
+        client.client_send(fileobj.node1, fileobj.port1, file1)
+        client.client_send(fileobj.node2, fileobj.port2, file2)
+        filenames = [file1, file2]
+        with open('/files/'+filename, 'w') as outfile:
+            for fname in filenames:
+                with open(fname) as infile:
+                    for line in infile:
+                        outfile.write(line)
+
+        for fname in filenames:
+            os.remove(fname)
+
+        added_files, removed_files = syncdb.sync_files()
+        return render(request, 'sync_results.html', {'added_files': added_files,
+                                                     'removed_files': removed_files})
     except:
         return HttpResponse('No such file')
 
 
-
 def download_file_tcp(request):
-    filename = request.GET.get('filename')
-    ip = request.GET.get('ip')
-    port = request.GET.get('port')
-
-    client.client_send(ip, port, filename)
-    added_files, removed_files = syncdb.sync_files()
-    print added_files
-    print removed_files
-    return HttpResponseRedirect('/search_results')
+    """
+    Deprecated method for downloading files through
+    tcp socket connection. File that is searched for on
+    neighboring node is running a tcp socket server,
+    and when file is clicked on in /search_results,
+    this method kicks off client connection to that server.
+    Handshake is established, then client sends filename to
+    server, and server sends back the filedata and filename.
+    :param request: wsgi request
+    :return: redirect back to search results
+    """
+    added_files, removed_files = file_methods.download_single_file(request)
+    return render(request, 'sync_results.html', {'added_files': added_files,
+                                                 'removed_files': removed_files})
 
 
 def sync_files(request):
+    """
+    Method to manually sync any files to the database.
+    Can add files to /files/ directory and hit sync and
+    it will update database. Can also remove files from
+    directory and sync will update it.
+    :param request: wsgi request
+    :return: render sync results page with files added and removed
+    """
     added_files, removed_files = syncdb.sync_files()
     return render(request, 'sync_results.html', {'added_files': added_files,
                                                  'removed_files': removed_files})
 
 
 def download_file(request):
-    filename = request.GET.get('filename')
-    try:
-        fileobj = File.objects.get(name=filename)
-    except:
-        return HttpResponse('No such file')
-
-    raw_text = open(fileobj.location + fileobj.name, 'rb').read()
-
-    response = HttpResponse(raw_text, content_type='text/plain')
-    response['Content-Disposition'] = 'attachment; filename={0}'.format(fileobj.name)
-
-    # TODO make it so files are downloaded to the /files/ dir in linux
-
-    logging.debug("Response: {0}".format(response))
+    """
+    Deprecated API method to download file directly
+    from page
+    :param request: wsgi request
+    :return: response with file
+    """
+    response = file_methods.download_file_http(request)
     return response
 
 
 def filelist_api(request):
-    host, port = request.META['HTTP_HOST'].split(':')
-    neighbors = Neighbors.objects.all()
-    filename = request.GET.get('filename')
-    hop_number = int(request.GET.get('hop'))
-    hop_number += 1
-    filelist = File.objects.all()
-    json_response = []
-    for file in filelist:
-        json_response.append({'name': file.name,
-                              'location': file.location,
-                              'category': file.category,
-                              'host': host,
-                              'port': port})
-    if filename is None:
-        filename = ''
-    if len(neighbors) != 0 and hop_number < 5:
-        for neighbor in neighbors:
-            try:
-                response = requests.get('http://{0}:{1}/api/v1/filelist?filename={2}&hop={3}'.format(neighbor.ip_address,
-                                                                                                     neighbor.port,
-                                                                                                     filename,
-                                                                                                     hop_number), timeout=5)
-                response = json.loads(response.text)
-                for response_file in response:
-                    if filename in response_file['name']:
-                        json_response.append({'name': response_file['name'],
-                                              'location': response_file['location'],
-                                              'category': response_file['category'],
-                                              'host': response_file['host'],
-                                              'port': response_file['port']})
-            except requests.exceptions.RequestException as e:
-                print "Error: Cannot access {0}:{1} -- {2}".format(neighbor.ip_address, neighbor.port, e)
-                continue
-
+    """
+    Search API for nodes that are getting queried for search.
+    Continues the depth first traversal of all neighboring
+    nodes until the maximum hop limit has been reached.
+    :param request:
+    :return:
+    """
+    json_response = search_methods.http_dfs_api(request)
     return HttpResponse(json.dumps(json_response))
 
 
 @csrf_exempt
 def upload_file(request):
-    if request.method != 'POST':
-        return HttpResponseBadRequest('Only POST requests are allowed')
-    file = request.FILES['myfile']
-    with open('/files/%s' % file.name, 'wb+') as dest:
-        for chunk in file.chunks():
-            dest.write(chunk)
-    added_files, removed_files = syncdb.sync_files()
+    """
+    Api method to allow for uploading files to the
+    system through the upload page
+    :param request: wsgi request
+    :return: OK response
+    """
+    file_methods.upload_file(request)
     return HttpResponse("file uploaded")
 

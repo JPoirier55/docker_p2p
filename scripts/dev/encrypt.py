@@ -6,9 +6,9 @@ Class: ECE456
 Assignment: Lab 1
 """
 
-
-from cipher_utils import *
 import argparse
+
+from scripts.dev.cipher_utils import *
 
 SPACE = [0, 0, 1, 0, 0, 0, 0, 0]
 
