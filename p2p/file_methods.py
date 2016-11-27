@@ -6,14 +6,14 @@
     November 1, 2016
 """
 
-
-from models import File, FileNodes, SplitFile
-from scripts import client
-from scripts.dev import client2
-from management import syncdb
-from django.http import HttpResponse, HttpResponseBadRequest
 import logging
 import os
+
+from django.http import HttpResponse, HttpResponseBadRequest
+
+from management import syncdb
+from models import File, FileNodes, SplitFile
+from scripts import client, client2
 
 
 def download_single_file(request):
