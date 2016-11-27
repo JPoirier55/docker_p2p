@@ -1,7 +1,17 @@
+"""
+    Docker peer to peer network
+    Author: Jake Poirier
+    ECE495 Independent study project
+    Colorado State University
+    November 1, 2016
+"""
+
+
 import socket
 import sys
 import argparse
 import os
+
 
 def client_send(ip, portnum, inputfile):
     """

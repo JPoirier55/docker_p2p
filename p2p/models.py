@@ -1,15 +1,31 @@
+"""
+    Docker peer to peer network
+    Author: Jake Poirier
+    ECE495 Independent study project
+    Colorado State University
+    November 1, 2016
+"""
+
+
 from django.db import models
 
 # Create your models here.
 
 
 class FileManager(models.Manager):
+    """
+        Wrapper to quickly create a file
+    """
     def create_file(self, name, location):
         file = self.create(name=name, location=location)
         return file
 
 
 class SplitFile(models.Model):
+    """
+        Table to split file into pieces across
+        multiple nodes
+    """
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=256)
     node1 = models.GenericIPAddressField(protocol='IPv4')
@@ -23,6 +39,9 @@ class SplitFile(models.Model):
 
 
 class File(models.Model):
+    """
+        Table for all file data
+    """
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=256)
 
@@ -52,6 +71,9 @@ class File(models.Model):
 
 
 class Neighbors(models.Model):
+    """
+        Table for indexing neighboring nodes to the system
+    """
     id = models.IntegerField(primary_key=True)
     hostname = models.CharField(max_length=256)
     ip_address = models.GenericIPAddressField(protocol='IPv4')
