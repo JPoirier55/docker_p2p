@@ -37,7 +37,6 @@ def create_server(ip, portnum):
 
             filename = header.split(" ")[1]
             cleanfilename = filename.split("/")[-1]
-            filesize = int(header.split(" ")[2])
 
             file = open('/files/{0}'.format(cleanfilename), "wb+")
 

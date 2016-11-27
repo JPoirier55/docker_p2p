@@ -85,3 +85,18 @@ class Neighbors(models.Model):
     def __str__(self):
         return '{0}-{1}-{2}'.format(str(self.id), self.hostname, self.ip_address)
 
+
+class FileNodes(models.Model):
+    id = models.IntegerField(primary_key=True)
+    hostname1 = models.CharField(max_length=256)
+    ip_address1 = models.GenericIPAddressField(protocol='IPv4')
+    port1 = models.IntegerField(default=8000)
+    hostname2 = models.CharField(max_length=256)
+    ip_address2 = models.GenericIPAddressField(protocol='IPv4')
+    port2 = models.IntegerField(default=8000)
+
+    class Meta:
+        unique_together = (('ip_address1', 'port1'),('ip_address2', 'port2'))
+
+    def __str__(self):
+        return '{0}-FIRST:{1}-{2}-SECOND:{3}-{4}'.format(str(self.id), self.hostname1, self.ip_address1, self.hostname2, self.ip_address2)

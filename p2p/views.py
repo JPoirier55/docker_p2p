@@ -12,7 +12,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from models import File, SplitFile
 from management import syncdb
 import search_methods
-import download_upload
+import file_methods
+import os
 from django.views.decorators.csrf import csrf_exempt
 
 from scripts import client
@@ -139,10 +140,23 @@ def download_split_tcp(request):
     filename = request.GET.get('filename', 'test')
     try:
         fileobj = SplitFile.objects.get(name=filename)
-        client.client_send(fileobj.node1, fileobj.port1, '/files/split1.txt')
-        client.client_send(fileobj.node2, fileobj.port2, '/files/split2.txt')
+        file1 = '/files/first_'+filename
+        file2 = '/files/second_'+filename
+        client.client_send(fileobj.node1, fileobj.port1, file1)
+        client.client_send(fileobj.node2, fileobj.port2, file2)
+        filenames = [file1, file2]
+        with open('/files/'+filename, 'w') as outfile:
+            for fname in filenames:
+                with open(fname) as infile:
+                    for line in infile:
+                        outfile.write(line)
 
-        return HttpResponseRedirect('/')
+        for fname in filenames:
+            os.remove(fname)
+
+        added_files, removed_files = syncdb.sync_files()
+        return render(request, 'sync_results.html', {'added_files': added_files,
+                                                     'removed_files': removed_files})
     except:
         return HttpResponse('No such file')
 
@@ -159,7 +173,7 @@ def download_file_tcp(request):
     :param request: wsgi request
     :return: redirect back to search results
     """
-    added_files, removed_files = download_upload.download_single_file(request)
+    added_files, removed_files = file_methods.download_single_file(request)
     return render(request, 'sync_results.html', {'added_files': added_files,
                                                  'removed_files': removed_files})
 
@@ -185,7 +199,7 @@ def download_file(request):
     :param request: wsgi request
     :return: response with file
     """
-    response = download_upload.download_file_http(request)
+    response = file_methods.download_file_http(request)
     return response
 
 
@@ -209,6 +223,6 @@ def upload_file(request):
     :param request: wsgi request
     :return: OK response
     """
-    download_upload.upload_file(request)
+    file_methods.upload_file(request)
     return HttpResponse("file uploaded")
 
