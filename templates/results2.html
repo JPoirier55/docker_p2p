@@ -1,0 +1,35 @@
+{% include 'index.html' %}
+{% block content %}
+    <title>Results</title>
+    <div class="upload_filebox" align="center">
+    <div id="summary">
+        <h2>Searching for: [{{ filename }}]</h2>
+    </div>
+
+    <table id="filetable">
+    <tr>
+        <th>
+            <a href="/search_page">Return</a>
+        </th>
+    </tr>
+    <tr><th>Filename</th>
+        <th>Category</th>
+        <th>Host:Port</th>
+        <th>Location</th>
+    </tr>
+
+    {% for file in files %}
+    <tr>
+        <td>
+            <a href="/api/v1/split?filename={{ file.name }}">{{ file.name }}</a>
+        </td>
+        <td>{{ file.category }}</td>
+        <td>{{ file.host }}:{{ file.port }}</td>
+        <td>{{ file.location }}</td>
+    </tr>
+    {% endfor %}
+    </table>
+    </div>
+
+
+{% endblock %}

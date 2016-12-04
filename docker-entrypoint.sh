@@ -5,7 +5,7 @@ git clone https://github.com/jpoirier55/docker_p2p
 python /docker_p2p/manage.py makemigrations
 python /docker_p2p/manage.py migrate
 
-echo "from django.contrib.auth.models import User; User.objects.create_superuser('jpoirier', '', 'pw')" | python /docker_p2p/manage.py shell
+echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', '', 'pw')" | python /docker_p2p/manage.py shell
 
 echo "This is the first test file" > /files/testfile.txt
 

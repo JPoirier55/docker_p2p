@@ -8,7 +8,7 @@ Assignment: Lab 1
 
 import argparse
 
-from scripts.dev.cipher_utils import *
+from scripts.cipher_utils import *
 
 SPACE = [0, 0, 1, 0, 0, 0, 0, 0]
 
