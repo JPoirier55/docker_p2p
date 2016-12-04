@@ -20,5 +20,5 @@ docker run -d -e PORT_NUM=8002 -e TCP_PORT_NUM2=65502 -e TCP_PORT_NUM=65002 -p 8
 docker run -d -e PORT_NUM=8003 -e TCP_PORT_NUM2=65503 -e TCP_PORT_NUM=65003 -p 8003:8003 <docker image ID>
 ```
 
-### To set file nodes see wiki at 
+### To set file nodes see wiki at https://github.com/JPoirier55/docker_p2p/wiki/Database-configuration
 
